@@ -8,7 +8,7 @@ app.secret_key = 'your_secret_key'  # Set a unique and secret key
 
 def generate_token(CLIENT_CONFIG, SCOPES):
     flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
-    creds = flow.run_local_server(port=0)
+    creds = flow.run_local_server(port=3232)
     token_info = {
         "token": creds.token,
         "refresh_token": creds.refresh_token,

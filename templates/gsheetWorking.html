@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Submission</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group select, .form-group textarea, .form-group input[type="text"], .form-group input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            resize: vertical;
+        }
+        .form-group .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-group button {
+            width: 48%;
+            padding: 10px;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .form-group button.submit {
+            background-color: #007BFF;
+        }
+        .form-group button.submit:hover {
+            background-color: #0056b3;
+        }
+        .form-group button.back {
+            background-color: #6c757d;
+        }
+        .form-group button.back:hover {
+            background-color: #5a6268;
+        }
+        .selected-values {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+        .selected-values .value {
+            background-color: #007BFF;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin: 5px 5px 0 0;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        .selected-values .value .remove {
+            margin-left: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .dropdown-container {
+            position: relative;
+        }
+        .dropdown-container select {
+            display: none;
+        }
+        .dropdown-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            z-index: 10;
+        }
+        .dropdown-menu label {
+            display: block;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .dropdown-menu label:hover {
+            background-color: #f1f1f1;
+        }
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                margin-top: 20px;
+            }
+            .form-group .button-container {
+                flex-direction: column;
+            }
+            .form-group button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Submit Your Data</h2>
+        <form id="dataForm" action="/gsheetworking" method="POST">
+            <div class="form-group">
+                <label for="platform">Platform:</label>
+                <div class="dropdown-container">
+                    <div class="dropdown-toggle" id="platform-toggle">Select Platforms</div>
+                    <div class="dropdown-menu" id="platform-menu">
+                        <label><input type="checkbox" value="LinkedIn"> LinkedIn</label>
+                        <label><input type="checkbox" value="Instagram"> Instagram</label>
+                    </div>
+                </div>
+                <input type="hidden" id="platform-hidden" name="platform">
+                <div class="selected-values" id="platform-values"></div>
+            </div>
+            <div class="form-group">
+                <label for="title-info">Title Info:</label>
+                <div class="dropdown-container">
+                    <div class="dropdown-toggle" id="title-info-toggle">Select Title Info</div>
+                    <div class="dropdown-menu" id="title-info-menu">
+                        <label><input type="checkbox" value="Thrift"> Thrift</label>
+                        <label><input type="checkbox" value="Second Hand"> Second Hand</label>
+                        <label><input type="checkbox" value="Vintage"> Vintage</label>
+                        <label><input type="checkbox" value="Resell"> Resell</label>
+                        <label><input type="checkbox" value="Curated Vintage"> Curated Vintage</label>
+                        <label><input type="checkbox" value="eBay Seller"> eBay Seller</label>
+                        <label><input type="checkbox" value="Shopify Seller"> Shopify Seller</label>
+                        <label><input type="checkbox" value="Ecommerce Entrepreneur"> Ecommerce Entrepreneur</label>
+                    </div>
+                </div>
+                <input type="hidden" id="title-info-hidden" name="titleInfo">
+                <div class="selected-values" id="title-info-values"></div>
+            </div>
+            <div class="form-group">
+                <label for="roles">Roles:</label>
+                <div class="dropdown-container">
+                    <div class="dropdown-toggle" id="roles-toggle">Select Roles</div>
+                    <div class="dropdown-menu" id="roles-menu">
+                        <label><input type="checkbox" value="Ecommerce Manager"> Ecommerce Manager</label>
+                        <label><input type="checkbox" value="Operation Manager"> Operation Manager</label>
+                        <label><input type="checkbox" value="Owner"> Owner</label>
+                        <label><input type="checkbox" value="CEO"> CEO</label>
+                        <label><input type="checkbox" value="Product Manager"> Product Manager</label>
+                    </div>
+                </div>
+                <input type="hidden" id="roles-hidden" name="roles">
+                <div class="selected-values" id="roles-values"></div>
+            </div>
+            <div class="form-group">
+                <label for="industry">Industry:</label>
+                <div class="dropdown-container">
+                    <div class="dropdown-toggle" id="industry-toggle">Select Industry</div>
+                    <div class="dropdown-menu" id="industry-menu">
+                        <label><input type="checkbox" value="Retail"> Retail</label>
+                        <label><input type="checkbox" value="Apparel"> Apparel</label>
+                        <label><input type="checkbox" value="Fashion"> Fashion</label>
+                    </div>
+                </div>
+                <input type="hidden" id="industry-hidden" name="industry">
+                <div class="selected-values" id="industry-values"></div>
+            </div>
+            <div class="form-group">
+                <label for="locations">Locations:</label>
+                <div class="dropdown-container">
+                    <div class="dropdown-toggle" id="locations-toggle">Select Locations</div>
+                    <div class="dropdown-menu" id="locations-menu">
+                        <label><input type="checkbox" value="New York"> New York</label>
+                        <label><input type="checkbox" value="Los Angeles"> Los Angeles</label>
+                        <label><input type="checkbox" value="Chicago"> Chicago</label>
+                        <label><input type="checkbox" value="Houston"> Houston</label>
+                        <label><input type="checkbox" value="San Francisco"> San Francisco</label>
+                    </div>
+                </div>
+                <input type="hidden" id="locations-hidden" name="locations">
+                <div class="selected-values" id="locations-values"></div>
+            </div>
+            <div class="form-group">
+                <label for="required">Required:</label>
+                <input type="text" id="required" name="required" required>
+            </div>
+            <div class="form-group">
+                <label for="noOfPages">Number of Pages:</label>
+                <input type="number" id="noOfPages" name="noOfPages" required>
+            </div>
+            <div class="form-group">
+                <div class="button-container">
+                    <button type="button" class="back" onclick="window.history.back();">Back</button>
+                    <button type="submit" class="submit">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const menuId = this.id.replace('-toggle', '-menu');
+                const menu = document.getElementById(menuId);
+                menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+        function handleCheckboxChange(event, valuesContainerId, hiddenInputId) {
+            const value = event.target.value;
+            const valuesContainer = document.getElementById(valuesContainerId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+            if (event.target.checked) {
+                const valueElement = document.createElement('div');
+                valueElement.className = 'value';
+                valueElement.textContent = value;
+                const removeButton = document.createElement('span');
+                removeButton.className = 'remove';
+                removeButton.textContent = '×';
+                removeButton.addEventListener('click', () => {
+                    event.target.checked = false;
+                    valueElement.remove();
+                    updateHiddenInput(hiddenInputId, valuesContainerId);
+                });
+                valueElement.appendChild(removeButton);
+                valuesContainer.appendChild(valueElement);
+                updateHiddenInput(hiddenInputId, valuesContainerId);
+            } else {
+                updateHiddenInput(hiddenInputId, valuesContainerId);
+            }
+        }
+        function updateHiddenInput(hiddenInputId, valuesContainerId) {
+            const hiddenInput = document.getElementById(hiddenInputId);
+            const selectedValues = Array.from(document.getElementById(valuesContainerId).children)
+                .map(valueElement => valueElement.textContent.replace('×', '').trim());
+            hiddenInput.value = selectedValues.join(', ');
+        }
+        function setupDropdown(menuId, valuesContainerId, hiddenInputId) {
+            document.getElementById(menuId).querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', (event) => handleCheckboxChange(event, valuesContainerId, hiddenInputId));
+            });
+        }
+        setupDropdown('platform-menu', 'platform-values', 'platform-hidden');
+        setupDropdown('title-info-menu', 'title-info-values', 'title-info-hidden');
+        setupDropdown('roles-menu', 'roles-values', 'roles-hidden');
+        setupDropdown('industry-menu', 'industry-values', 'industry-hidden');
+        setupDropdown('locations-menu', 'locations-values', 'locations-hidden');
+    </script>
+    <!-- Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-body" id="modalMessage"></div>
+        </div>
+    </div>
+    <!-- Hidden script element to safely inject JSON data -->
+    <script id="messages" type="application/json">
+        {{ get_flashed_messages() | tojson | safe }}
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var messagesElement = document.getElementById('messages');
+            var messages = [];
+            if (messagesElement) {
+                try {
+                    messages = JSON.parse(messagesElement.textContent || '[]');
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                }
+            }
+            if (messages.length > 0) {
+                var modal = document.getElementById('messageModal');
+                var modalMessage = document.getElementById('modalMessage');
+                var span = document.getElementsByClassName('close')[0];
+                modalMessage.innerHTML = messages.join('<br>');
+                modal.style.display = 'flex';
+                span.onclick = function() {
+                    modal.style.display = 'none';
+                }
+                window.onclick = function(event) {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

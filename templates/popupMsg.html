@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popup Example</title>
+    <style>
+        /* The Modal (background) */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Button to trigger the popup -->
+    <button onclick="sendRequest()">Show Popup</button>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <p id="modal-message">Message goes here...</p>
+        </div>
+    </div>
+
+    <script>
+        // Function to show the popup
+        function showPopup(message) {
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('myModal').style.display = 'block';
+        }
+
+        // Function to close the popup
+        function closePopup() {
+            document.getElementById('myModal').style.display = 'none';
+        }
+
+        // Optional: Close the modal if the user clicks anywhere outside of the modal
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('myModal')) {
+                closePopup();
+            }
+        }
+
+        // Function to send a request and show the popup with the server response
+        function sendRequest() {
+            fetch('/gmailworking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    // Your request data here
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showPopup(data.response.message || 'Data received successfully');
+            })
+            .catch(error => {
+                showPopup('Error occurred: ' + error.message);
+            });
+        }
+    </script>
+</body>
+</html>

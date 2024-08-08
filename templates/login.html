@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+        }
+        .logo {
+            margin-bottom: 20px;
+        }
+        .logo img {
+            width: 60px;
+            height: 60px;
+        }
+        h1 {
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #333333;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            margin-bottom: 20px;
+            border: 1px solid #d1d1d1;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #fafafa;
+        }
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #6a4ef5;
+            outline: none;
+            background-color: #ffffff;
+        }
+        .btn {
+            background-color: #6a4ef5;
+            color: #ffffff;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #5a3ae0;
+        }
+        .signup {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555555;
+        }
+        .signup a {
+            color: #6a4ef5;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .signup a:hover {
+            color: #5a3ae0;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 15% auto;
+            width: 80%;
+            max-width: 300px;
+            position: relative;
+        }
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #f00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://your-logo-url.com/logo.png" alt="Logo">
+        </div>
+        <h1>Sign in</h1>
+        <form action="/login" method="post">
+            <input type="email" name="email" placeholder="Email address" required>
+            <input type="password" name="password" placeholder="Enter your password" required>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <div class="signup">
+            Don't have an account? <a href="#">Sign up</a>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-body" id="modalMessage"></div>
+        </div>
+    </div>
+
+    <!-- Hidden script element to safely inject JSON data -->
+    <script id="messages" type="application/json">
+        {{ get_flashed_messages() | tojson | safe }}
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var messagesElement = document.getElementById('messages');
+            var messages = [];
+            if (messagesElement) {
+                try {
+                    messages = JSON.parse(messagesElement.textContent || '[]');
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                }
+            }
+
+            if (messages.length > 0) {
+                var modal = document.getElementById('messageModal');
+                var modalMessage = document.getElementById('modalMessage');
+                var span = document.getElementsByClassName('close')[0];
+
+                modalMessage.innerHTML = messages.join('<br>');
+                modal.style.display = 'flex';
+
+                span.onclick = function() {
+                    modal.style.display = 'none';
+                }
+
+                window.onclick = function(event) {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

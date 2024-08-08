@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Submission</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .logo {
+            margin-bottom: 20px;
+        }
+        .logo img {
+            width: 60px;
+            height: 60px;
+        }
+        h1 {
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #333333;
+        }
+        input[type="text"],
+        textarea,
+        input[type="time"],
+        input[type="url"] {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            margin-bottom: 20px;
+            border: 1px solid #d1d1d1;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #fafafa;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+            overflow-y: auto;
+        }
+        input[type="text"]:focus,
+        textarea:focus,
+        input[type="time"]:focus,
+        input[type="url"]:focus {
+            border-color: #6a4ef5;
+            outline: none;
+            background-color: #ffffff;
+        }
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #6a4ef5;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background-color: #fafafa;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .btn, .back-btn {
+            background-color: #6a4ef5;
+            color: #ffffff;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 48%;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover, .back-btn:hover {
+            background-color: #5a3ae0;
+        }
+        .back-btn {
+            background-color: #cccccc;
+            color: #333333;
+        }
+        .back-btn:hover {
+            background-color: #bbbbbb;
+        }
+        .signup {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555555;
+        }
+        .signup a {
+            color: #6a4ef5;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .signup a:hover {
+            color: #5a3ae0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://your-logo-url.com/logo.png" alt="Logo">
+        </div>
+        <h1>Submit Your Data</h1>
+        <form id="dataForm" action="/gmailworking" method="POST">
+            <input type="text" name="subject" placeholder="Subject">
+            <textarea name="email" placeholder="Email address"></textarea>
+            <input type="time" name="timeToStart" placeholder="Time to start">
+            <input type="url" name="calendlyLink" placeholder="Calendly link">
+            <div class="button-container">
+                <button type="button" class="back-btn" onclick="window.history.back();">Back</button>
+                <button type="submit" class="btn">START</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

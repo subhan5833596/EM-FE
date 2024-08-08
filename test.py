@@ -49,7 +49,7 @@ def login():
         password = request.form['password']
 
         # Step 1: Log in the user
-        login_response = requests.post('http://127.0.0.1:8000/login', json={'email': email, 'password': password})
+        login_response = requests.post('https://emerging-special-stingray.ngrok-free.app/login', json={'email': email, 'password': password})
         print("Login response:", login_response.json())  # Debug print the login response
         
         if login_response.status_code == 200:
@@ -93,7 +93,7 @@ def generate_google_token():
     except:
         token_info = None
     # Step 2: Generate token for the user
-    token_url = 'http://127.0.0.1:8000/generate_client_token'
+    token_url = 'https://emerging-special-stingray.ngrok-free.app/generate_client_token'
     token_response = requests.post(token_url, json={'email': email, 'token_info': token_info})
 
     if token_response.status_code == 200:
@@ -116,7 +116,7 @@ def Msheet():
         input_sheet_url = request.form['sheet_url']
         if sheet_url == None:
             try:
-                response = requests.post('http://127.0.0.1:8000/update_sheet_url', json={'email': email, 'sheet_url': input_sheet_url })
+                response = requests.post('https://emerging-special-stingray.ngrok-free.app/update_sheet_url', json={'email': email, 'sheet_url': input_sheet_url })
 
                 # Check if the response is successful
                 if response.status_code == 200:
@@ -178,7 +178,7 @@ def gsheetworking():
             print(f"Error: {e}")
         # Send data to the GooglesheetWorking endpoint
         try:
-            response = requests.post('http://127.0.0.1:8000/googlesheetWorking', json=data)
+            response = requests.post('https://emerging-special-stingray.ngrok-free.app/googlesheetWorking', json=data)
 
             # Check if the response is successful
             if response.status_code == 200:
@@ -217,9 +217,7 @@ def gamilworking():
         print(data)
         subject = data.get('subject')
         if subject:
-            response = requests.post('http://127.0.0.1:8000/gmailWorking', json=data)
-        else:
-            response = requests.post('http://127.0.0.1:8000/startSending')
+            response = requests.post('https://emerging-special-stingray.ngrok-free.app/gmailWorking', json=data)
         # Check if the response is successful
         if response.status_code == 200:
             session['updated'] = True

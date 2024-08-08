@@ -95,7 +95,7 @@ def generate_google_token():
         token_info = None
     # Step 2: Generate token for the user
     try:
-        token_url = 'https://sheepdog-refined-lioness.ngrok-free.app//generate_client_token'
+        token_url = 'https://sheepdog-refined-lioness.ngrok-free.app/generate_client_token'
         token_response = requests.post(token_url, json={'email': email, 'token_info': token_info})
     except Exception as e:
         print(e)

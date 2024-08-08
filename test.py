@@ -31,7 +31,7 @@ def signup_and_generate_token():
         password = request.form['password']
 
         # Step 1: Register the user
-        signup_url = 'https://emerging-special-stingray.ngrok-free.app/signup'
+        signup_url = 'https://sheepdog-refined-lioness.ngrok-free.app/signup'
         signup_response = requests.post(signup_url, json={'email': email, 'password': password})
 
         if signup_response.status_code == 200:
@@ -49,7 +49,7 @@ def login():
         password = request.form['password']
 
         # Step 1: Log in the user
-        login_response = requests.post('https://emerging-special-stingray.ngrok-free.app/login', json={'email': email, 'password': password})
+        login_response = requests.post('https://sheepdog-refined-lioness.ngrok-free.app/login', json={'email': email, 'password': password})
         print("Login response:", login_response.json())  # Debug print the login response
         
         if login_response.status_code == 200:
@@ -73,6 +73,7 @@ def login():
 @app.route('/generate_google_token', methods=['GET'])
 def generate_google_token():
     email = session['user_email']
+    print(email)
     if not email:
         return jsonify({"error": "Email parameter missing"}), 400
 
@@ -85,7 +86,7 @@ def generate_google_token():
             "token_uri": "https://oauth2.googleapis.com/token",
             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
             "client_secret": "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",
-            "redirect_uris": ["http://localhost"]
+            "redirect_uris": ["http://localhost" , "https://sheepdog-refined-lioness.ngrok-free.app"]
         }
     }
     try:
@@ -93,9 +94,11 @@ def generate_google_token():
     except:
         token_info = None
     # Step 2: Generate token for the user
-    token_url = 'https://emerging-special-stingray.ngrok-free.app/generate_client_token'
-    token_response = requests.post(token_url, json={'email': email, 'token_info': token_info})
-
+    try:
+        token_url = 'https://sheepdog-refined-lioness.ngrok-free.app//generate_client_token'
+        token_response = requests.post(token_url, json={'email': email, 'token_info': token_info})
+    except Exception as e:
+        print(e)
     if token_response.status_code == 200:
         flash('Credentials created, please log in again')
         return redirect(url_for('login'))

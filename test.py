@@ -31,7 +31,10 @@ def signup_and_generate_token():
         password = request.form['password']
 
         # Step 1: Register the user
-        signup_url = 'http://192.168.15.99:3232/signup'
+        try:
+            signup_url = 'http://192.168.15.99:3232/signup'
+        except:
+            signup_url = 'http://127.0.0.1:3232/signup'
         signup_response = requests.post(signup_url, json={'email': email, 'password': password})
 
         if signup_response.status_code == 200:
@@ -96,6 +99,8 @@ def generate_google_token():
     # Step 2: Generate token for the user
     try:
         token_url = 'http://192.168.15.99:3232/generate_client_token'
+    except:
+        token_url = 'http://127.0.0.1:3232/generate_client_token'
         token_response = requests.post(token_url, json={'email': email, 'token_info': token_info})
     except Exception as e:
         print(e)

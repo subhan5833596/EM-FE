@@ -28,7 +28,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://mail.google.c
 
 def generate_token(CLIENT_CONFIG, SCOPES):
     flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
-    auth_url, _ = flow.authorization_url(prompt='consent')
+    auth_url, _ = flow.authorization_url(prompt='consent', redirect_uri='https://emfe-fires-projects-5c2c6ff4.vercel.app/oauth2callback')
     print(f"Generated authorization URL: {auth_url}")
     return auth_url
 
@@ -100,7 +100,7 @@ def oauth2callback():
 
     try:
         flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
-        flow.redirect_uri = url_for('oauth2callback', _external=True)
+        flow.redirect_uri = 'https://emfe-fires-projects-5c2c6ff4.vercel.app/oauth2callback'
         print(f"Redirect URI: {flow.redirect_uri}")
         
         flow.fetch_token(authorization_response=request.url)

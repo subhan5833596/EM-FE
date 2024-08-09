@@ -79,17 +79,8 @@ def generate_google_token():
         return jsonify({"error": "Email parameter missing"}), 400
 
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://mail.google.com/']
-    CLIENT_CONFIG = {
-        "installed": {
-            "client_id": "286365376596-mdnhnaq6r6sur80mmpkdls8b5kkj61g6.apps.googleusercontent.com",
-            "project_id": "email-430207",
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-            "client_secret": "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",
-            "redirect_uris": ["http://localhost"]
-        }
-    }
+    CLIENT_CONFIG = {"web":{"client_id":"286365376596-j08s8o63gfpqeh951hea2poppo6ascii.apps.googleusercontent.com","project_id":"email-430207","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["https://your-vercel-domain.vercel.app/callback","https://sheepdog-refined-lioness.ngrok-free.app"]}}
+    
     try:
         token_info = generate_token(CLIENT_CONFIG, SCOPES)
     except:

@@ -1,27 +1,26 @@
 import json
 from flask import Flask, request, jsonify, render_template, redirect, session, url_for, flash
 import requests
-from google_auth_oauthlib.flow import InstalledAppFlow, Flow
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a unique and secret key
 
+# Your Google OAuth 2.0 Client Configuration
+CLIENT_CONFIG = {"web":{"client_id":"286365376596-j08s8o63gfpqeh951hea2poppo6ascii.apps.googleusercontent.com","project_id":"email-430207","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["https://emfe-fires-projects-5c2c6ff4.vercel.app/oauth2callback","https://sheepdog-refined-lioness.ngrok-free.app"]}}
+
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://mail.google.com/']
+
 def generate_token(CLIENT_CONFIG, SCOPES):
-    email = session['user_email']
-    if not email:
-        return jsonify({"error": "Email parameter missing"}), 400
-
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://mail.google.com/']
-    CLIENT_CONFIG = {"web":{"client_id":"YOUR_CLIENT_ID","project_id":"YOUR_PROJECT_ID","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"YOUR_CLIENT_SECRET","redirect_uris":["YOUR_REDIRECT_URIS"]}}
-
     flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
-    auth_url, _ = flow.authorization_url(access_type='offline', prompt='consent')
-
-    return redirect(auth_url)
+    auth_url, _ = flow.authorization_url(prompt='consent')
+    return auth_url
 
 @app.route('/', methods=['GET'])
 def home():
-    return jsonify({"message": "a live"}), 200
+    return jsonify({"message": "Service is live"}), 200
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup_and_generate_token():
@@ -29,12 +28,11 @@ def signup_and_generate_token():
         email = request.form['email']
         password = request.form['password']
 
-        # Step 1: Register the user
+        # Register the user
         signup_url = 'https://sheepdog-refined-lioness.ngrok-free.app/signup'
         signup_response = requests.post(signup_url, json={'email': email, 'password': password})
 
         if signup_response.status_code == 200:
-            # Notify user to complete token generation later
             session['user_email'] = email
             return redirect(url_for('generate_google_token'))
         else:
@@ -47,14 +45,11 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        # Step 1: Log in the user
-        login_response = requests.post('https://your-api-domain/login', json={'email': email, 'password': password})
-        print("Login response:", login_response.json())  # Debug print the login response
-        
+        # Log in the user
+        login_response = requests.post('https://sheepdog-refined-lioness.ngrok-free.app/login', json={'email': email, 'password': password})
         if login_response.status_code == 200:
             auth_status = login_response.json().get('message')
             sheet_url = login_response.json().get('sheet_url')
-            print("Auth status:", auth_status)  # Debug print the auth status
             if auth_status:
                 session['user_email'] = email
                 session['credentials'] = auth_status
@@ -68,65 +63,27 @@ def login():
 
 @app.route('/generate_google_token', methods=['GET'])
 def generate_google_token():
-    email = session['user_email']
+    email = session.get('user_email')
     if not email:
         return jsonify({"error": "Email parameter missing"}), 400
 
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://mail.google.com/']
-    CLIENT_CONFIG = {
-        "web": {
-            "client_id": "286365376596-j08s8o63gfpqeh951hea2poppo6ascii.apps.googleusercontent.com",
-            "project_id": "email-430207",
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-            "client_secret": "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",
-            "redirect_uris": [
-                "https://emfe-fires-projects-5c2c6ff4.vercel.app/oauth2callback",
-                "https://sheepdog-refined-lioness.ngrok-free.app/oauth2callback"
-            ]
-        }
-    }
-
     try:
-        token_info = generate_token(CLIENT_CONFIG, SCOPES)
-        token_url = 'https://sheepdog-refined-lioness.ngrok-free.app/generate_client_token'
-        token_response = requests.post(token_url, json={'email': email, 'token_info': token_info})
-
-        if token_response.status_code == 200:
-            flash('Credentials created, please log in again')
-            return redirect(url_for('login'))
-        elif token_response.status_code == 400:
-            flash('Account Created')
-            return redirect(url_for('login'))
-        else:
-            return jsonify({"error": "Token generation failed", "status_code": token_response.status_code}), 500
+        auth_url = generate_token(CLIENT_CONFIG, SCOPES)
+        return redirect(auth_url)
     except Exception as e:
-        print(f"Error generating token: {e}")
-        return jsonify({"error": "Token generation failed"}), 500
+        return jsonify({"error": "Error generating token", "details": str(e)}), 500
 
-@app.route('/oauth2callback')
+@app.route('/oauth2callback', methods=['GET'])
 def oauth2callback():
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://mail.google.com/']
-    CLIENT_CONFIG = {
-        "web": {
-            "client_id": "YOUR_CLIENT_ID",
-            "project_id": "YOUR_PROJECT_ID",
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-            "client_secret": "YOUR_CLIENT_SECRET",
-            "redirect_uris": ["YOUR_REDIRECT_URI"]
-        }
-    }
+    if not session.get('user_email'):
+        return jsonify({"error": "User not authenticated"}), 401
 
     flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
-    flow.redirect_uri = url_for('oauth2callback', _external=True)
-    
-    # Exchange the authorization code for credentials
-    authorization_response = request.url
-    flow.fetch_token(authorization_response=authorization_response)
-    
+    flow.fetch_token(authorization_response=request.url)
+
+    if not flow.credentials:
+        return jsonify({"error": "Failed to obtain credentials"}), 500
+
     creds = flow.credentials
     token_info = {
         "token": creds.token,
@@ -138,8 +95,8 @@ def oauth2callback():
         "expiry": creds.expiry.isoformat() if creds.expiry else None
     }
 
-    # Return or handle the token info as needed
-    return jsonify(token_info)
+    session['token_info'] = token_info
+    return redirect(url_for('login'))
 
 
 @app.route('/Msheet', methods=['GET', 'POST'])

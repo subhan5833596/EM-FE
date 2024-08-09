@@ -9,13 +9,27 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a unique and secret key
 
 # Your Google OAuth 2.0 Client Configuration
-CLIENT_CONFIG = {"web":{"client_id":"286365376596-j08s8o63gfpqeh951hea2poppo6ascii.apps.googleusercontent.com","project_id":"email-430207","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["https://emfe-fires-projects-5c2c6ff4.vercel.app/oauth2callback","https://sheepdog-refined-lioness.ngrok-free.app"]}}
+CLIENT_CONFIG = {
+    "web": {
+        "client_id": "286365376596-j08s8o63gfpqeh951hea2poppo6ascii.apps.googleusercontent.com",
+        "project_id": "email-430207",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_secret": "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",
+        "redirect_uris": [
+            "https://emfe-fires-projects-5c2c6ff4.vercel.app/oauth2callback",
+            "https://sheepdog-refined-lioness.ngrok-free.app"
+        ]
+    }
+}
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://mail.google.com/']
 
 def generate_token(CLIENT_CONFIG, SCOPES):
     flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
     auth_url, _ = flow.authorization_url(prompt='consent')
+    print(f"Generated authorization URL: {auth_url}")
     return auth_url
 
 @app.route('/', methods=['GET'])
@@ -27,10 +41,12 @@ def signup_and_generate_token():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        print(f"Signup attempt with email: {email}")
 
         # Register the user
         signup_url = 'https://sheepdog-refined-lioness.ngrok-free.app/signup'
         signup_response = requests.post(signup_url, json={'email': email, 'password': password})
+        print(f"Signup response: {signup_response.status_code} - {signup_response.text}")
 
         if signup_response.status_code == 200:
             session['user_email'] = email
@@ -44,9 +60,12 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        print(f"Login attempt with email: {email}")
 
         # Log in the user
         login_response = requests.post('https://sheepdog-refined-lioness.ngrok-free.app/login', json={'email': email, 'password': password})
+        print(f"Login response: {login_response.status_code} - {login_response.text}")
+
         if login_response.status_code == 200:
             auth_status = login_response.json().get('message')
             sheet_url = login_response.json().get('sheet_url')
@@ -71,6 +90,7 @@ def generate_google_token():
         auth_url = generate_token(CLIENT_CONFIG, SCOPES)
         return redirect(auth_url)
     except Exception as e:
+        print(f"Error generating token: {str(e)}")
         return jsonify({"error": "Error generating token", "details": str(e)}), 500
 
 @app.route('/oauth2callback', methods=['GET'])
@@ -78,8 +98,16 @@ def oauth2callback():
     if not session.get('user_email'):
         return jsonify({"error": "User not authenticated"}), 401
 
-    flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
-    flow.fetch_token(authorization_response=request.url)
+    try:
+        flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
+        flow.redirect_uri = url_for('oauth2callback', _external=True)
+        print(f"Redirect URI: {flow.redirect_uri}")
+        
+        flow.fetch_token(authorization_response=request.url)
+        print(f"Authorization response URL: {request.url}")
+    except Exception as e:
+        print(f"Error fetching token: {str(e)}")
+        return jsonify({"error": "Error fetching token", "details": str(e)}), 500
 
     if not flow.credentials:
         return jsonify({"error": "Failed to obtain credentials"}), 500

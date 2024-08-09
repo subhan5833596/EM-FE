@@ -7,19 +7,17 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a unique and secret key
 
 def generate_token(CLIENT_CONFIG, SCOPES):
+    email = session['user_email']
+    if not email:
+        return jsonify({"error": "Email parameter missing"}), 400
+
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://mail.google.com/']
+    CLIENT_CONFIG = {"web":{"client_id":"YOUR_CLIENT_ID","project_id":"YOUR_PROJECT_ID","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"YOUR_CLIENT_SECRET","redirect_uris":["YOUR_REDIRECT_URIS"]}}
+
     flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
-    flow.redirect_uri = url_for('oauth2callback', _external=True)
-    creds = flow.run_local_server(port=3232)
-    token_info = {
-        "token": creds.token,
-        "refresh_token": creds.refresh_token,
-        "token_uri": creds.token_uri,
-        "client_id": CLIENT_CONFIG['web']['client_id'],
-        "client_secret": CLIENT_CONFIG['web']['client_secret'],
-        "scopes": SCOPES,
-        "expiry": creds.expiry.isoformat() if creds.expiry else None
-    }
-    return token_info
+    auth_url, _ = flow.authorization_url(access_type='offline', prompt='consent')
+
+    return redirect(auth_url)
 
 @app.route('/', methods=['GET'])
 def home():
@@ -109,14 +107,15 @@ def generate_google_token():
 
 @app.route('/oauth2callback')
 def oauth2callback():
-    state = session.get('state')
-    flow = Flow.from_client_config(CLIENT_CONFIG, SCOPES, state=state)
+    state = session.get('state')  # Optional: if you used state in your authorization request
+    flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES, state=state)
     flow.redirect_uri = url_for('oauth2callback', _external=True)
-
+    
+    # Handle the authorization response
     authorization_response = request.url
     flow.fetch_token(authorization_response=authorization_response)
+    
     creds = flow.credentials
-
     token_info = {
         "token": creds.token,
         "refresh_token": creds.refresh_token,
@@ -127,7 +126,6 @@ def oauth2callback():
         "expiry": creds.expiry.isoformat() if creds.expiry else None
     }
 
-    # Store token_info or handle it as needed
     return jsonify(token_info)
 
 @app.route('/Msheet', methods=['GET', 'POST'])

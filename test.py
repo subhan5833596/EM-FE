@@ -79,8 +79,7 @@ def generate_google_token():
         return jsonify({"error": "Email parameter missing"}), 400
 
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://mail.google.com/']
-    CLIENT_CONFIG = {"web":{"client_id":"286365376596-j08s8o63gfpqeh951hea2poppo6ascii.apps.googleusercontent.com","project_id":"email-430207","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["https://your-vercel-domain.vercel.app/callback","https://sheepdog-refined-lioness.ngrok-free.app"]}}
-    
+    CLIENT_CONFIG = {"web":{"client_id":"286365376596-j08s8o63gfpqeh951hea2poppo6ascii.apps.googleusercontent.com","project_id":"email-430207","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["https://emfe-fires-projects-5c2c6ff4.vercel.app/","https://sheepdog-refined-lioness.ngrok-free.app"]}}
     try:
         token_info = generate_token(CLIENT_CONFIG, SCOPES)
     except:

@@ -106,6 +106,14 @@ def generate_google_token():
         print(f"Error generating token: {str(e)}")
         return jsonify({"error": "Error generating token", "details": str(e)}), 500
 
+def credentials_to_dict(credentials):
+  return {'token': credentials.token,
+          'refresh_token': credentials.refresh_token,
+          'token_uri': credentials.token_uri,
+          'client_id': credentials.client_id,
+          'client_secret': credentials.client_secret,
+          'scopes': credentials.scopes}
+    
 @app.route('/oauth2callback', methods=['GET'])
 def oauth2callback():
     if not session.get('user_email'):
@@ -127,7 +135,7 @@ def oauth2callback():
 
     if not flow.credentials:
         return jsonify({"error": "Failed to obtain credentials"}), 500
-
+    print(flask.session['credentials'])
     creds = flow.credentials
     token_info = {
         "token": creds.token,

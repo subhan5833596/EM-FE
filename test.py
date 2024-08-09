@@ -99,11 +99,10 @@ def generate_google_token():
     # Step 2: Generate token for the user
     try:
         token_url = 'http://192.168.15.99:3232/generate_client_token'
-    except:
-        token_url = 'http://127.0.0.1:3232/generate_client_token'
         token_response = requests.post(token_url, json={'email': email, 'token_info': token_info})
     except Exception as e:
-        print(e)
+        token_url = 'http://127.0.0.1:3232/generate_client_token'
+        token_response = requests.post(token_url, json={'email': email, 'token_info': token_info})
     if token_response.status_code == 200:
         flash('Credentials created, please log in again')
         return redirect(url_for('login'))

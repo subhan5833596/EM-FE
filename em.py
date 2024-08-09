@@ -107,11 +107,23 @@ def generate_google_token():
 
 @app.route('/oauth2callback')
 def oauth2callback():
-    state = session.get('state')  # Optional: if you used state in your authorization request
-    flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES, state=state)
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://mail.google.com/']
+    CLIENT_CONFIG = {
+        "web": {
+            "client_id": "YOUR_CLIENT_ID",
+            "project_id": "YOUR_PROJECT_ID",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_secret": "YOUR_CLIENT_SECRET",
+            "redirect_uris": ["YOUR_REDIRECT_URI"]
+        }
+    }
+
+    flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
     flow.redirect_uri = url_for('oauth2callback', _external=True)
     
-    # Handle the authorization response
+    # Exchange the authorization code for credentials
     authorization_response = request.url
     flow.fetch_token(authorization_response=authorization_response)
     
@@ -126,7 +138,9 @@ def oauth2callback():
         "expiry": creds.expiry.isoformat() if creds.expiry else None
     }
 
+    # Return or handle the token info as needed
     return jsonify(token_info)
+
 
 @app.route('/Msheet', methods=['GET', 'POST'])
 def Msheet():

@@ -4,7 +4,7 @@ import requests
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import os
-
+import google_auth_oauthlib.flow
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a unique and secret key
@@ -88,8 +88,20 @@ def generate_google_token():
         return jsonify({"error": "Email parameter missing"}), 400
 
     try:
-        auth_url = generate_token(CLIENT_CONFIG, SCOPES)
-        return redirect(auth_url)
+        flow = google_auth_oauthlib.flow.Flow.from_client_config(CLIENT_CONFIG, SCOPES)
+        flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+
+        authorization_url, state = flow.authorization_url(
+              # Enable offline access so that you can refresh an access token without
+              # re-prompting the user for permission. Recommended for web server apps.
+              access_type='offline',
+              # Enable incremental authorization. Recommended as a best practice.
+              include_granted_scopes='true')
+        
+          # Store the state so the callback can verify the auth server response.
+        flask.session['state'] = state
+        
+        return flask.redirect(authorization_url)
     except Exception as e:
         print(f"Error generating token: {str(e)}")
         return jsonify({"error": "Error generating token", "details": str(e)}), 500
@@ -100,12 +112,15 @@ def oauth2callback():
         return jsonify({"error": "User not authenticated"}), 401
 
     try:
-        flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
-        flow.redirect_uri = 'https://emfe-fires-projects-5c2c6ff4.vercel.app/oauth2callback'
+        state = flask.session['state']
+        flow = google_auth_oauthlib.flow.Flow.from_client_config(CLIENT_CONFIG, SCOPES)
+        flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
         print(f"Redirect URI: {flow.redirect_uri}")
-        
-        flow.fetch_token(authorization_response=request.url)
+        authorization_response = flask.request.url
+        flow.fetch_token(authorization_response=authorization_response)
         print(f"Authorization response URL: {request.url}")
+        credentials = flow.credentials
+        flask.session['credentials'] = credentials_to_dict(credentials)
     except Exception as e:
         print(f"Error fetching token: {str(e)}")
         return jsonify({"error": "Error fetching token", "details": str(e)}), 500

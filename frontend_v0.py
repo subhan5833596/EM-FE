@@ -156,7 +156,7 @@ def Msheet():
         input_sheet_url = request.form['sheet_url']
         if sheet_url is None:
             try:
-                response = requests.post('https://your-api-domain/update_sheet_url', json={'email': email, 'sheet_url': input_sheet_url })
+                response = requests.post('https://sheepdog-refined-lioness.ngrok-free.app/update_sheet_url', json={'email': email, 'sheet_url': input_sheet_url })
 
                 if response.status_code == 200:
                     session['sheet_url'] = input_sheet_url
@@ -214,7 +214,7 @@ def gsheetworking():
         except Exception as e:
             print(f"Error: {e}")
         try:
-            response = requests.post('https://your-api-domain/googlesheetWorking', json=data)
+            response = requests.post('https://sheepdog-refined-lioness.ngrok-free.app/googlesheetWorking', json=data)
 
             if response.status_code == 200:
                 session['updated'] = True
@@ -254,7 +254,7 @@ def gamilworking():
             'required': request.form.get('required'),
         }
         try:
-            response = requests.post('https://your-api-domain/gmailWorking', json=data)
+            response = requests.post('https://sheepdog-refined-lioness.ngrok-free.app/gmailWorking', json=data)
             if response.status_code == 200:
                 session['updated'] = True
                 flash('GMAIL UPDATED SUCCESSFULLY')

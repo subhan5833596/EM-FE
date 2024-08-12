@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "em.py",
+      "src": "frontend_v0.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "em.py"
+      "dest": "frontend_v0.py"
     }
   ]
 }

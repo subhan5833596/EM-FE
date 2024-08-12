@@ -112,7 +112,7 @@ def oauth2callback():
 
 
 def credentials_to_dict(credentials):
-  expiry_time = datetime.utcnow() + datetime.timedelta(hours=1)
+  expiry_time = datetime.now() + datetime.timedelta(hours=1)
   expiry = expiry_time.isoformat() + 'Z'  # Format it as an ISO 8601 string
   return {'token': credentials.token,
           'refresh_token': credentials.refresh_token,

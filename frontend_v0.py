@@ -135,12 +135,12 @@ def login():
                 session['user_email'] = email
                 session['credentials'] = auth_status
                 session['sheet_url'] = sheet_url
-                return redirect(url_for('Msheet'))
+                return redirect(url_for('login'))
             else:
                 return redirect(url_for('generate_google_token'))
         else:
             return jsonify({"error": "Login failed", "status_code": login_response.status_code}), 500
-    return render_template('../templates/login.html')
+    return render_template('login.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -1,3 +1,4 @@
+import datetime
 import json
 from flask import Flask, request, jsonify, render_template, redirect, session, url_for, flash
 import requests
@@ -45,7 +46,7 @@ def registration():
               # re-prompting the user for permission. Recommended for web server apps.
               access_type='offline',
               # Enable incremental authorization. Recommended as a best practice.
-              include_granted_scopes='true',prompt='consent')
+              include_granted_scopes='true')
         
           # Store the state so the callback can verify the auth server response.
         flask.session['state'] = state
@@ -71,12 +72,12 @@ def oauth2callback():
         flask.session['credentials'] = credentials_to_dict(credentials)
         try:
             signup_url = 'https://sheepdog-refined-lioness.ngrok-free.app/signup'
-            signup_response = requests.post(signup_url, json={'email': session.get('user_email'), 'password': session.get('user_password')})
+            signup_response = requests.post(signup_url, json={'email': session.get('user_email'), 'password': session.get('user_pass')})
             print(f"Signup response: {signup_response.status_code} - {signup_response.text}")
 
             if signup_response.status_code == 200:
                 token_url = 'https://sheepdog-refined-lioness.ngrok-free.app/generate_client_token'
-                token_response = requests.post(token_url, json={'email': session.get('user_email'), 'password': session.get('user_password'),'token_info': credentials_to_dict(credentials)})
+                token_response = requests.post(token_url, json={'email': session.get('user_email'), 'password': session.get('user_pass'),'token_info': credentials_to_dict(credentials)})
                 flash('SUCCESSFULLY SIGN UP')
                 if token_response.status_code == 200:
                     flash('Credentials created, please log in again')
@@ -111,13 +112,15 @@ def oauth2callback():
 
 
 def credentials_to_dict(credentials):
-  print(credentials)
+  expiry_time = datetime.utcnow() + datetime.timedelta(hours=1)
+  expiry = expiry_time.isoformat() + 'Z'  # Format it as an ISO 8601 string
   return {'token': credentials.token,
           'refresh_token': credentials.refresh_token,
           'token_uri': credentials.token_uri,
           'client_id': credentials.client_id,
           'client_secret': credentials.client_secret,
-          'scopes': credentials.scopes}
+          'scopes': credentials.scopes,
+          'expiry': expiry}
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

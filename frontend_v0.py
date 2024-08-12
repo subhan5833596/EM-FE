@@ -76,13 +76,15 @@ def oauth2callback():
 
             if signup_response.status_code == 200:
                 token_url = 'https://sheepdog-refined-lioness.ngrok-free.app/generate_client_token'
-                token_response = requests.post(token_url, json={'email': session.get('user_email'), 'password': session.get('user_pass'),'token_info': credentials_to_dict(credentials)})
-
+                token_response = requests.post(token_url, json={'email': session.get('user_email'), 'password': session.get('user_password'),'token_info': credentials_to_dict(credentials)})
+                flash('SUCCESSFULLY SIGN UP')
                 if token_response.status_code == 200:
                     flash('Credentials created, please log in again')
                     return redirect(url_for('login'))
                 else:
                     return jsonify({"error": "Token generation failed", "status_code": token_response.status_code}), 500
+            else:
+                flash('EMAIL IS ALREADY IN USE')
         except Exception as e:
             print(f"Error updating token: {str(e)}")
     except Exception as e:
@@ -109,6 +111,7 @@ def oauth2callback():
 
 
 def credentials_to_dict(credentials):
+  print(credentials)
   return {'token': credentials.token,
           'refresh_token': credentials.refresh_token,
           'token_uri': credentials.token_uri,
@@ -135,12 +138,135 @@ def login():
                 session['user_email'] = email
                 session['credentials'] = auth_status
                 session['sheet_url'] = sheet_url
-                return redirect(url_for('login'))
+                return redirect(url_for('Msheet'))
             else:
                 return redirect(url_for('generate_google_token'))
         else:
             return jsonify({"error": "Login failed", "status_code": login_response.status_code}), 500
-    return render_template('login.html')
+    return render_template('../templates/login.html')
+
+@app.route('/Msheet', methods=['GET', 'POST'])
+def Msheet():
+    if request.method == 'POST':
+        email = session.get('user_email')
+        sheet_url = session.get('sheet_url')
+        
+        if not email:
+            return jsonify({"error": "User not logged in"}), 401
+        input_sheet_url = request.form['sheet_url']
+        if sheet_url is None:
+            try:
+                response = requests.post('https://your-api-domain/update_sheet_url', json={'email': email, 'sheet_url': input_sheet_url })
+
+                if response.status_code == 200:
+                    session['sheet_url'] = input_sheet_url
+                    flash('SHEET URL UPDATED SUCCESSFULLY')
+                    return redirect(url_for('Msheet'))
+                else:
+                    flash('FAILED ')
+                    return redirect(url_for('Msheet'))
+            except Exception as e:
+                flash('UNEXPECTED ERROR PLEASE TRY AGAIN')
+                print(f"Error: {e}")
+                return redirect(url_for('Msheet'))
+        else:
+            flash('SHEET URL ALREADY EXIST')
+            return redirect(url_for('Msheet'))
+    sheet_url = session.get('sheet_url')
+    updated = session.get('updated')
+    updated = bool(updated)
+    print(sheet_url , updated)
+    return render_template('sheeturl.html', url=sheet_url, updated=updated)
+
+@app.route('/gsheetworking', methods=['GET', 'POST'])
+def gsheetworking():
+    if request.method == 'POST':
+        email = session.get('user_email')
+        credentials = session.get('credentials')
+        sheet_url = session.get('sheet_url')
+        if not email:
+            return jsonify({"error": "User not logged in"}), 401
+        if not credentials:
+            return jsonify({"error": "No credentials found"}), 500
+        if not sheet_url:
+            return jsonify({"error": "No sheet url found"}), 501
+        
+        no_of_pages = request.form.get('noOfPages')
+        if no_of_pages is not None:
+            try:
+                no_of_pages = int(no_of_pages)
+            except ValueError:
+                return jsonify({"error": "Invalid value for noOfPages, must be an integer"}), 400
+        try:
+            data = {
+                'cred': credentials,
+                'email': email,
+                'sheet_url': sheet_url,
+                'platform': request.form.get('platform'),
+                'titleInfo': request.form.get('titleInfo', '').split(', '),
+                'roles': request.form.get('roles', '').split(', '),
+                'industry': request.form.get('industry', '').split(', '),
+                'locations': request.form.get('locations', '').split(', '),
+                'required': request.form.get('required'),
+                'noOfPages': no_of_pages
+            }
+            print(data)
+        except Exception as e:
+            print(f"Error: {e}")
+        try:
+            response = requests.post('https://your-api-domain/googlesheetWorking', json=data)
+
+            if response.status_code == 200:
+                session['updated'] = True
+                flash('SHEET UPDATED SUCCESSFULLY')
+                return redirect(url_for('Msheet'))
+            else:
+                flash('FAILED UPDATING SHEET')
+                return redirect(url_for('gsheetworking'))
+        except Exception as e:
+            flash('UNEXPECTED ERROR PLEASE TRY AGAIN')
+            print(f"Error: {e}")
+            return redirect(url_for('gsheetworking'))
+    return render_template('gsheetworking.html')
+
+@app.route('/gmailworking', methods=['GET', 'POST'])
+def gamilworking():
+    if request.method == 'POST':
+        email = session.get('user_email')
+        credentials = session.get('credentials')
+        sheet_url = session.get('sheet_url')
+        print(sheet_url)
+        if not email:
+            return jsonify({"error": "User not logged in"}), 401
+        if not credentials:
+            return jsonify({"error": "No credentials found"}), 500
+        if not sheet_url:
+            return jsonify({"error": "No sheet url found"}), 501
+        data = {
+            'cred': credentials,
+            'email': email,
+            'sheet_url': sheet_url,
+            'platform': request.form.get('platform'),
+            'titleInfo': request.form.get('titleInfo', '').split(', '),
+            'roles': request.form.get('roles', '').split(', '),
+            'industry': request.form.get('industry', '').split(', '),
+            'locations': request.form.get('locations', '').split(', '),
+            'required': request.form.get('required'),
+        }
+        try:
+            response = requests.post('https://your-api-domain/gmailWorking', json=data)
+            if response.status_code == 200:
+                session['updated'] = True
+                flash('GMAIL UPDATED SUCCESSFULLY')
+                return redirect(url_for('Msheet'))
+            else:
+                flash('FAILED UPDATING GMAIL')
+                return redirect(url_for('gamilworking'))
+        except Exception as e:
+            flash('UNEXPECTED ERROR PLEASE TRY AGAIN')
+            print(f"Error: {e}")
+            return redirect(url_for('gamilworking'))
+    return render_template('gmailworking.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

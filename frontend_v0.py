@@ -143,7 +143,7 @@ def login():
                 return redirect(url_for('generate_google_token'))
         else:
             return jsonify({"error": "Login failed", "status_code": login_response.status_code}), 500
-    return render_template('../templates/login.html')
+    return render_template('login.html')
 
 @app.route('/Msheet', methods=['GET', 'POST'])
 def Msheet():

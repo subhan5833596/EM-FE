@@ -227,7 +227,7 @@ def gsheetworking():
             flash('UNEXPECTED ERROR PLEASE TRY AGAIN')
             print(f"Error: {e}")
             return redirect(url_for('gsheetworking'))
-    return render_template('gsheetworking.html')
+    return render_template('gsheetWorking.html')
 
 @app.route('/gmailworking', methods=['GET', 'POST'])
 def gamilworking():
@@ -266,7 +266,7 @@ def gamilworking():
             flash('UNEXPECTED ERROR PLEASE TRY AGAIN')
             print(f"Error: {e}")
             return redirect(url_for('gamilworking'))
-    return render_template('gmailworking.html')
+    return render_template('gmailWorking.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

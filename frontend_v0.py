@@ -76,7 +76,7 @@ def oauth2callback():
 
             if signup_response.status_code == 200:
                 token_url = 'https://sheepdog-refined-lioness.ngrok-free.app/generate_client_token'
-                token_response = requests.post(token_url, json={'email': session.get('user_email'), 'password': session.get('user_password'),'token_info': credentials_to_dict(credentials)})
+                token_response = requests.post(token_url, json={'email': session.get('user_email'), 'password': session.get('user_pass'),'token_info': credentials_to_dict(credentials)})
 
                 if token_response.status_code == 200:
                     flash('Credentials created, please log in again')

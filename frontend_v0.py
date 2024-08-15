@@ -158,7 +158,7 @@ def gmailworking():
         subject = data.get('subject')
         if subject:
             try:
-                response = requests.post('http://127.0.0.1:3232/gmailWorking', json=data)
+                response = requests.post('https://emerging-special-stingray.ngrok-free.app/gmailWorking', json=data)
                 if response.status_code == 200:
                     session['updated'] = True
                     flash('STARTED SENDING MAILS')

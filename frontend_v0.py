@@ -22,7 +22,7 @@ def signup():
         password = request.form['password']
 
         # Step 1: Register the user
-        signup_url = 'http://127.0.0.1:3232/signup'
+        signup_url = 'https://emerging-special-stingray.ngrok-free.app/signup'
         signup_response = requests.post(signup_url, json={'email': email, 'password': password})
 
         if signup_response.status_code == 200:
@@ -40,7 +40,7 @@ def login():
         print(f"Login attempt with email: {email}")
 
         # Log in the user
-        login_response = requests.post('http://127.0.0.1:3232/login', json={'email': email, 'password': password})
+        login_response = requests.post('https://emerging-special-stingray.ngrok-free.app/login', json={'email': email, 'password': password})
         print(f"Login response: {login_response.status_code} - {login_response.text}")
 
         if login_response.status_code == 200:

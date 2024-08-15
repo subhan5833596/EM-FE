@@ -141,7 +141,7 @@ def gmailworking():
         email = session.get('user_email')
         password = session.get('user_pass')
         sheet_url = session.get('sheet_url')
-        print(sheet_url)
+        print(sheet_url , password)
         if not email:
             return jsonify({"error": "User not logged in"}), 401
        

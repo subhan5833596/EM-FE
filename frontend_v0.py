@@ -29,7 +29,8 @@ def signup():
             session['user_email'] = email
             return redirect(url_for('login'))
         else:
-            return jsonify({"error": "Signup failed", "status_code": signup_response.status_code}), 500
+            flash('FAILED TO CREATE ACCOUNT')
+            return redirect(url_for('signup'))
     return render_template('signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -52,7 +53,8 @@ def login():
                 session['sheet_url'] = sheet_url
                 return redirect(url_for('Msheet'))
         else:
-            return jsonify({"error": "Login failed", "status_code": login_response.status_code}), 500
+            flash('LOGIN FAILED')
+            return redirect(url_for('login'))
     return render_template('login.html')
 
 @app.route('/Msheet', methods=['GET', 'POST'])
@@ -92,6 +94,7 @@ def Msheet():
 def gsheetworking():
     if request.method == 'POST':
         email = session.get('user_email')
+        password = session.get('user_pass')
         sheet_url = session.get('sheet_url')
         if not email:
             return jsonify({"error": "User not logged in"}), 401
@@ -107,6 +110,7 @@ def gsheetworking():
         try:
             data = {
                 'email': email,
+                'password' : password,
                 'sheet_url': sheet_url,
                 'platform': request.form.get('platform'),
                 'titleInfo': request.form.get('titleInfo', '').split(', '),

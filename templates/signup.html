@@ -22,6 +22,10 @@
             width: 100%;
             max-width: 360px;
             text-align: center;
+            transition: transform 0.5s ease;
+        }
+        .container.moved {
+            transform: translateX(-150px);
         }
         .logo {
             margin-bottom: 20px;
@@ -51,6 +55,18 @@
             border-color: #6a4ef5;
             outline: none;
             background-color: #ffffff;
+        }
+        .help-link {
+            font-size: 14px;
+            color: #6a4ef5;
+            cursor: pointer;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: block;
+            transition: color 0.3s ease;
+        }
+        .help-link:hover {
+            color: #5a3ae0;
         }
         .checkbox {
             display: flex;
@@ -92,16 +108,46 @@
         .signin a:hover {
             color: #5a3ae0;
         }
+        .video-container {
+            position: absolute;
+            top: 50%;
+            left: calc(50% + 200px);
+            transform: translateY(-50%);
+            display: none;
+            /* background-color: #ffffff; */
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 5px;
+            max-width: 600px; /* Increased max-width to 600px */
+            z-index: 10;
+        }
+        .video-container iframe {
+            width: 100%; /* Set iframe width to 100% */
+            height: 340px; /* Adjusted height proportionally */
+            border-radius: 5px;
+            border: none;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: transparent;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="signupContainer">
         <div class="logo">
             <img src="https://your-logo-url.com/logo.png" alt="Logo">
         </div>
         <h1>Create an account</h1>
         <form action="/signup" method="post">
             <input type="email" name="email" placeholder="Email address" required>
+            <a class="help-link" onclick="showVideo()">Click here to watch how to create an app password</a>
             <input type="password" name="password" placeholder="Enter your password" required>
             <div class="checkbox">
                 <input type="checkbox" id="terms" required>
@@ -113,5 +159,22 @@
             Already registered? <a href="#">Sign in</a>
         </div>
     </div>
+
+    <div class="video-container" id="videoContainer">
+        <button class="close-btn" onclick="hideVideo()">X</button>
+        <iframe src="./create.mp4" title="How to create an app password" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        function showVideo() {
+            document.getElementById('signupContainer').classList.add('moved');
+            document.getElementById('videoContainer').style.display = 'block';
+        }
+
+        function hideVideo() {
+            document.getElementById('signupContainer').classList.remove('moved');
+            document.getElementById('videoContainer').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
